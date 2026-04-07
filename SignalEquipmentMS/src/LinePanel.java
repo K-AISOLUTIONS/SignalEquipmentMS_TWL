@@ -60,6 +60,13 @@ public class LinePanel extends JPanel implements ActionListener {
                 ControlPanel.beaconButton.setText("Show Beacon");
                 ControlPanel.beaconDataButton.setEnabled(false);
             }
+            if (TWLPanel.isShowTag){
+                ControlPanel.tagButton.setText("Hide Tag");
+                ControlPanel.tagDataButton.setEnabled(true);
+            } else {
+                ControlPanel.tagButton.setText("Show Tag");
+                ControlPanel.tagDataButton.setEnabled(false);
+            }
             if (TWLPanel.isShowSab){
                 ControlPanel.sabButton.setText("Hide SAB");
                 ControlPanel.sabDataButton.setEnabled(true);
@@ -110,6 +117,11 @@ public class LinePanel extends JPanel implements ActionListener {
                 ControlPanel.beaconDataButton.setText("Hide Beacon Location");
             } else {
                 ControlPanel.beaconDataButton.setText("Show Beacon Location");
+            }
+            if (TWLPanel.isShowTagData){
+                ControlPanel.tagDataButton.setText("Hide Tag Location");
+            } else {
+                ControlPanel.tagDataButton.setText("Show Tag Location");
             }
             if (TWLPanel.isShowSabData){
                 ControlPanel.sabDataButton.setText("Hide SAB Location");

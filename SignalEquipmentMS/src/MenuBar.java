@@ -1643,6 +1643,81 @@ public class MenuBar extends JMenuBar implements ActionListener {
                                 }
 
                                 break;
+                            case "Tag":
+
+                                tempLines = new ArrayList<>();
+                                tempStations = new ArrayList<>();
+                                tempSides = new ArrayList<>();
+                                ArrayList<String> tempTagIds = new ArrayList<>();
+                                tempLocations = new ArrayList<>();
+
+                                while(rowIterator.hasNext()){
+                                    Row row = rowIterator.next();
+                                    Iterator<Cell> cellIterator = row.cellIterator();
+                                    while(cellIterator.hasNext()){
+                                        Cell cell = cellIterator.next();
+                                        if (row.getRowNum() == 0) {
+
+                                        } else {
+                                            if (cell.getColumnIndex() == 0) {
+                                                tempLines.add(cell.getStringCellValue());
+                                            } else if (cell.getColumnIndex() == 1) {
+                                                tempStations.add(cell.getStringCellValue());
+                                            } else if (cell.getColumnIndex() == 2) {
+                                                tempSides.add(cell.getStringCellValue());
+                                            } else if (cell.getColumnIndex() == 3) {
+                                                tempTagIds.add(cell.getStringCellValue());
+                                            } else if (cell.getColumnIndex() == 4) {
+                                                tempLocations.add(cell.getNumericCellValue());
+                                            }
+                                        }
+                                    }
+                                }
+
+                                TWL = 0; KTL = 0; TKL = 0; ISL = 0;
+                                for (int i = 0; i < tempLines.size(); i++) {
+                                    if (tempLines.get(i).equals("TWL")) {
+                                        TWL++;
+                                    }
+                                    if (tempLines.get(i).equals("KTL")) {
+                                        KTL++;
+                                    }
+                                    if (tempLines.get(i).equals("TKL")) {
+                                        TKL++;
+                                    }
+                                    if (tempLines.get(i).equals("ISL")) {
+                                        ISL++;
+                                    }
+                                }
+
+                                TWLPanel.tagLines = new String[TWL];
+                                TWLPanel.tagStations = new String[TWL];
+                                TWLPanel.tagSides = new String[TWL];
+                                TWLPanel.tagIds = new String[TWL];
+                                TWLPanel.tagLocations = new double[TWL];
+
+                                TWL = 0; KTL = 0; TKL = 0; ISL = 0;
+                                for (int i = 0; i < tempLines.size(); i++) {
+                                    if (tempLines.get(i).equals("TWL")) {
+                                        TWLPanel.tagLines[TWL] = tempLines.get(i);
+                                        TWLPanel.tagStations[TWL] = tempStations.get(i);
+                                        TWLPanel.tagSides[TWL] = tempSides.get(i);
+                                        TWLPanel.tagIds[TWL] = tempTagIds.get(i);
+                                        TWLPanel.tagLocations[TWL] = tempLocations.get(i);
+                                        TWL++;
+                                    }
+                                    if (tempLines.get(i).equals("KTL")) {
+                                        KTL++;
+                                    }
+                                    if (tempLines.get(i).equals("TKL")) {
+                                        TKL++;
+                                    }
+                                    if (tempLines.get(i).equals("ISL")) {
+                                        ISL++;
+                                    }
+                                }
+
+                                break;
                             case "SAB":
 
                                 tempLines = new ArrayList<>();
@@ -2000,6 +2075,7 @@ public class MenuBar extends JMenuBar implements ActionListener {
                     ControlPanel.signalButton.setEnabled(true);
                     ControlPanel.impedanceBondButton.setEnabled(true);
                     ControlPanel.beaconButton.setEnabled(true);
+                    ControlPanel.tagButton.setEnabled(true);
                     ControlPanel.sabButton.setEnabled(true);
                     ControlPanel.boxButton.setEnabled(true);
                     ControlPanel.otherButton.setEnabled(true);
