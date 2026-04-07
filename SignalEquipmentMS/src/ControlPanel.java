@@ -11,6 +11,7 @@ public class ControlPanel extends JPanel implements ActionListener {
     public static JButton signalButton; public static JButton signalDataButton;
     public static JButton impedanceBondButton; public static JButton impedanceBondDataButton;
     public static JButton beaconButton; public static JButton beaconDataButton;
+    public static JButton tagButton; public static JButton tagDataButton;
     public static JButton sabButton; public static JButton sabDataButton;
     public static JButton boxButton; public static JButton boxDataButton;
     public static JButton otherButton; public static JButton otherDataButton;
@@ -50,6 +51,11 @@ public class ControlPanel extends JPanel implements ActionListener {
         beaconButton.addActionListener(this);
         beaconButton.setEnabled(false);
         this.add(beaconButton);
+
+        tagButton = new JButton("Show Tag");
+        tagButton.addActionListener(this);
+        tagButton.setEnabled(false);
+        this.add(tagButton);
 
         sabButton = new JButton("Show SAB");
         sabButton.addActionListener(this);
@@ -108,6 +114,11 @@ public class ControlPanel extends JPanel implements ActionListener {
         beaconDataButton.addActionListener(this);
         beaconDataButton.setEnabled(false);
         this.add(beaconDataButton);
+
+        tagDataButton = new JButton("Show Tag Location");
+        tagDataButton.addActionListener(this);
+        tagDataButton.setEnabled(false);
+        this.add(tagDataButton);
 
 
         sabDataButton = new JButton("Show SAB Location");
@@ -322,6 +333,23 @@ public class ControlPanel extends JPanel implements ActionListener {
                 }
             }
 
+
+            MyFrame.changeDisplay("");
+            MyFrame.changeDisplay(MyFrame.currentPanel);
+        }
+
+        if (e.getSource() == tagButton) {
+            if (MyFrame.currentPanel.equals("TWL")) {
+                TWLPanel.isShowTag = !TWLPanel.isShowTag;
+
+                if (TWLPanel.isShowTag){
+                    tagButton.setText("Hide Tag");
+                    tagDataButton.setEnabled(true);
+                } else {
+                    tagButton.setText("Show Tag");
+                    tagDataButton.setEnabled(false);
+                }
+            }
 
             MyFrame.changeDisplay("");
             MyFrame.changeDisplay(MyFrame.currentPanel);
@@ -727,6 +755,20 @@ public class ControlPanel extends JPanel implements ActionListener {
             MyFrame.changeDisplay(MyFrame.currentPanel);
         }
 
+        if (e.getSource() == tagDataButton) {
+            if (MyFrame.currentPanel.equals("TWL")) {
+                TWLPanel.isShowTagData = !TWLPanel.isShowTagData;
+                if (TWLPanel.isShowTagData){
+                    tagDataButton.setText("Hide Tag Location");
+                } else {
+                    tagDataButton.setText("Show Tag Location");
+                }
+            }
+
+            MyFrame.changeDisplay("");
+            MyFrame.changeDisplay(MyFrame.currentPanel);
+        }
+
         if (e.getSource() == sabDataButton) {
             if (MyFrame.currentPanel.equals("TWL")) {
                 TWLPanel.isShowSabData = !TWLPanel.isShowSabData;
@@ -858,7 +900,7 @@ public class ControlPanel extends JPanel implements ActionListener {
         if (e.getSource() == stationDropdown) {
             if (!String.valueOf(stationDropdown.getItemAt(stationDropdown.getSelectedIndex())).equals("")) {
                 equipmentDropdown.removeAllItems();
-                String[] equipmentList = {"Track Circuit", "Platform", "Signal", "Switch", "Crossing", "Impedance Bond", "Beacon", "SAB", "Box", "Others"};
+                String[] equipmentList = {"Track Circuit", "Platform", "Signal", "Switch", "Crossing", "Impedance Bond", "Beacon", "Tag", "SAB", "Box", "Others"};
                 for (int i = 0; i < equipmentList.length; i++) {
                     equipmentDropdown.addItem(equipmentList[i]);
                 }
@@ -1091,6 +1133,17 @@ public class ControlPanel extends JPanel implements ActionListener {
                         for (int i = 0; i < ISLPanel.beaconIds.length; i++) {
                             if (ISLPanel.beaconStations[i].equals(String.valueOf(stationDropdown.getItemAt(stationDropdown.getSelectedIndex())))) {
                                 idDropdown.addItem(ISLPanel.beaconIds[i]);
+                            }
+                        }
+                    }
+
+                    break;
+                case "Tag":
+                    idDropdown.removeAllItems();
+                    if (MyFrame.currentPanel.equals("TWL")) {
+                        for (int i = 0; i < TWLPanel.tagIds.length; i++) {
+                            if (TWLPanel.tagStations[i].equals(String.valueOf(stationDropdown.getItemAt(stationDropdown.getSelectedIndex())))) {
+                                idDropdown.addItem(TWLPanel.tagIds[i]);
                             }
                         }
                     }
@@ -1363,6 +1416,29 @@ public class ControlPanel extends JPanel implements ActionListener {
                                     verticalScrollBar.setValue(TWLPanel.upTrack);
                                 }
                                 if (TWLPanel.beaconSides[i].equals("DN")) {
+                                    verticalScrollBar.setValue(TWLPanel.dnTrack);
+                                }
+
+                                MyFrame.changeDisplay("");
+                                MyFrame.changeDisplay(MyFrame.currentPanel);
+                            }
+                        }
+                        break;
+                    case "Tag":
+                        for (int i = 0; i < TWLPanel.tagIds.length; i++) {
+                            if (TWLPanel.tagStations[i].equals(TWLPanel.selectedStation) && TWLPanel.tagIds[i].equals(TWLPanel.selectedId)) {
+                                JScrollBar verticalScrollBar = MyFrame.TWLScrollPanel.getVerticalScrollBar();
+                                JScrollBar horizontalScrollBar = MyFrame.TWLScrollPanel.getHorizontalScrollBar();
+
+                                TWLPanel.offsetX = -700; TWLPanel.offsetY= -350;
+                                TWLPanel.startPanX = 0; TWLPanel.startPanY = 0;
+                                TWLPanel.scaleX = 1; TWLPanel.scaleY = 1;
+
+                                horizontalScrollBar.setValue((int)(TWLPanel.tagLocations[i]));
+                                if (TWLPanel.tagSides[i].equals("UP")) {
+                                    verticalScrollBar.setValue(TWLPanel.upTrack);
+                                }
+                                if (TWLPanel.tagSides[i].equals("DN")) {
                                     verticalScrollBar.setValue(TWLPanel.dnTrack);
                                 }
 
