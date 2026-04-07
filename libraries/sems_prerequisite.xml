@@ -1,0 +1,24 @@
+<component name="libraryTable">
+  <library name="sems-prerequisite">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/poi-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/poi-examples-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/poi-excelant-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/poi-ooxml-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/poi-ooxml-full-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/poi-ooxml-lite-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/poi-scratchpad-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/lib/commons-collections4-4.4.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/lib/commons-io-2.11.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/ooxml-lib/commons-compress-1.21.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/ooxml-lib/commons-logging-1.2.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/ooxml-lib/xmlbeans-5.1.1.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/apache-log4j-2.20.0-bin/log4j-api-2.20.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/apache-log4j-2.20.0-bin/log4j-core-2.20.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/Downloads/poi-bin-5.2.3/poi-javadoc-5.2.3.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

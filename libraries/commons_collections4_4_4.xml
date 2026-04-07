@@ -1,0 +1,24 @@
+<component name="libraryTable">
+  <library name="commons-collections4-4.4">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/commons-collections4-4.4.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/commons-compress-1.21.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/commons-io-2.11.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/commons-logging-1.2.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/log4j-api-2.20.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/log4j-core-2.20.0.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/poi-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/poi-examples-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/poi-excelant-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/poi-ooxml-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/poi-ooxml-full-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/poi-ooxml-lite-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/poi-scratchpad-5.2.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/xmlbeans-5.1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/Downloads/libraries (prerequisites)/poi-javadoc-5.2.3.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>
