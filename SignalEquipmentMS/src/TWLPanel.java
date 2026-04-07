@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
 
 public class TWLPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ActionListener{
 

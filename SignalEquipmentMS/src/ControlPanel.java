@@ -19,9 +19,9 @@ public class ControlPanel extends JPanel implements ActionListener {
 
 
 
-    public static JComboBox stationDropdown;
-    public static JComboBox equipmentDropdown;
-    public static JComboBox idDropdown;
+    public static JComboBox<String> stationDropdown;
+    public static JComboBox<String> equipmentDropdown;
+    public static JComboBox<String> idDropdown;
     public static JButton searchButton;
 
 
@@ -152,20 +152,20 @@ public class ControlPanel extends JPanel implements ActionListener {
 
         JLabel enterStationLabel = new JLabel("Choose the Station: ");
         this.add(enterStationLabel);
-        stationDropdown = new JComboBox(new String[] {});
+        stationDropdown = new JComboBox<>(new String[] {});
         stationDropdown.addActionListener(this);
         this.add(stationDropdown);
 
         JLabel enterEquipmentLabel = new JLabel("Choose the Equipment: ");
         this.add(enterEquipmentLabel);
-        equipmentDropdown = new JComboBox(new String[] {});
+        equipmentDropdown = new JComboBox<>(new String[] {});
         equipmentDropdown.addActionListener(this);
         this.add(equipmentDropdown);
 
 
         JLabel enterIdLabel = new JLabel("Choose the ID: ");
         this.add(enterIdLabel);
-        idDropdown = new JComboBox(new String[] {});
+        idDropdown = new JComboBox<>(new String[] {});
         idDropdown.addActionListener(this);
         this.add(idDropdown);
 
