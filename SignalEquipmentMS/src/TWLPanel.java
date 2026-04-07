@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
 
 public class TWLPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ActionListener{
 
@@ -1131,6 +1129,50 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
         }
     }
 
+    public void drawTag(Graphics2D g, double xCoordinate, int yCoordinate, String upOrDn, String id, int equipRefFromTrack, int trackRefFromTrack, boolean isSelected){
+        int x = (int)worldToScreenConverter(xCoordinate, offsetX, scaleX);
+        int y = (int)worldToScreenConverter(yCoordinate, offsetY, scaleY);
+
+        if (isSelected) {
+            g.setColor(Color.RED);
+        }
+
+        if (upOrDn.equals("UP")) {
+            g.drawRect(x, y - paddingToScale(10 + 5, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
+            g.fillRect(x, y - paddingToScale(10 + 5, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
+            g.drawRect(x + paddingToScale(2, 'X'), y - paddingToScale(10 + 5, 'Y'), paddingToScale(8, 'X'), paddingToScale(5, 'Y'));
+
+            int idWidth = g.getFontMetrics().stringWidth(id);
+            int idHeight = g.getFontMetrics().getHeight();
+            g.drawString(id, x + paddingToScale(5, 'X') - idWidth / 2, y - paddingToScale(10 + 10 + 1, 'Y') + idHeight / 2);
+
+            if (isShowTagData) {
+                int numberWidth = g.getFontMetrics().stringWidth(String.valueOf(xCoordinate));
+                g.drawLine(x, y - paddingToScale(equipRefFromTrack, 'Y'), x, y - paddingToScale(trackRefFromTrack, 'Y'));
+                g.drawString(String.valueOf(xCoordinate), x-numberWidth/2, y - paddingToScale(equipRefFromTrack + 5, 'Y'));
+            }
+        }
+        if (upOrDn.equals("DN")) {
+            g.drawRect(x - paddingToScale(2, 'X'), y + paddingToScale(10, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
+            g.fillRect(x - paddingToScale(2, 'X'), y + paddingToScale(10, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
+            g.drawRect(x - paddingToScale(2 + 8, 'X'), y + paddingToScale(10, 'Y'), paddingToScale(8, 'X'), paddingToScale(5, 'Y'));
+
+            int idWidth = g.getFontMetrics().stringWidth(id);
+            int idHeight = g.getFontMetrics().getHeight();
+            g.drawString(id, x - paddingToScale(5, 'X') - idWidth / 2, y + paddingToScale(10 + 5 + 2, 'Y') + idHeight / 2);
+
+            if (isShowTagData) {
+                int numberWidth = g.getFontMetrics().stringWidth(String.valueOf(xCoordinate));
+                g.drawLine(x, y + paddingToScale(equipRefFromTrack, 'Y'), x, y + paddingToScale(trackRefFromTrack, 'Y'));
+                g.drawString(String.valueOf(xCoordinate), x-numberWidth/2, y + paddingToScale(equipRefFromTrack + 10, 'Y'));
+            }
+        }
+
+        if (isSelected) {
+            g.setColor(Color.BLACK);
+        }
+    }
+
 
 
 
@@ -1640,6 +1682,17 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
                     }
                     if (beaconSides[i].equals("DN")) {
                         drawBeacon(g, beaconLocations[i], dnTrack, beaconSides[i], beaconIds[i], beaconTypes[i], beaconLabels[i], equipmentRefDistance, trackRefDistance, beaconReverses[i], (selectedEquipment.equals("Beacon") && beaconStations[i].equals(selectedStation) && beaconIds[i].equals(selectedId)));
+                    }
+                }
+            }
+
+            if (isShowTag) {
+                for (int i = 0; i < tagLines.length; i++) {
+                    if (tagSides[i].equals("UP")) {
+                        drawTag(g, tagLocations[i], upTrack, tagSides[i], tagIds[i], equipmentRefDistance, trackRefDistance, (selectedEquipment.equals("Tag") && tagStations[i].equals(selectedStation) && tagIds[i].equals(selectedId)));
+                    }
+                    if (tagSides[i].equals("DN")) {
+                        drawTag(g, tagLocations[i], dnTrack, tagSides[i], tagIds[i], equipmentRefDistance, trackRefDistance, (selectedEquipment.equals("Tag") && tagStations[i].equals(selectedStation) && tagIds[i].equals(selectedId)));
                     }
                 }
             }

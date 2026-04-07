@@ -9,9 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -1643,6 +1641,100 @@ public class MenuBar extends JMenuBar implements ActionListener {
                                 }
 
                                 break;
+                            case "Tag":
+
+                                tempLines = new ArrayList<>();
+                                tempStations = new ArrayList<>();
+                                tempSides = new ArrayList<>();
+                                ArrayList<String> tempTagIds = new ArrayList<>();
+                                tempLocations = new ArrayList<>();
+
+                                int sideColumn = 2;
+                                int tagIdColumn = 3;
+                                int kpLocationColumn = 4;
+
+                                while(rowIterator.hasNext()){
+                                    Row row = rowIterator.next();
+                                    if (row.getRowNum() == 0) {
+                                        for (int col = 0; col <= row.getLastCellNum(); col++) {
+                                            Cell headerCell = row.getCell(col);
+                                            if (headerCell == null) {
+                                                continue;
+                                            }
+                                            String headerText = headerCell.toString().trim().toLowerCase();
+                                            if (headerText.contains("side")) {
+                                                sideColumn = col;
+                                            }
+                                            if (headerText.equals("tag id") || headerText.contains("tag id")) {
+                                                tagIdColumn = col;
+                                            }
+                                            if (headerText.contains("kp")) {
+                                                kpLocationColumn = col;
+                                            }
+                                        }
+                                    } else {
+                                        Cell lineCell = row.getCell(0);
+                                        Cell stationCell = row.getCell(1);
+                                        Cell sideCell = row.getCell(sideColumn);
+                                        Cell tagIdCell = row.getCell(tagIdColumn);
+                                        Cell kpLocationCell = row.getCell(kpLocationColumn);
+
+                                        if (lineCell == null || stationCell == null || sideCell == null || tagIdCell == null || kpLocationCell == null) {
+                                            continue;
+                                        }
+
+                                        tempLines.add(lineCell.toString().trim());
+                                        tempStations.add(stationCell.toString().trim());
+                                        tempSides.add(sideCell.toString().trim());
+                                        tempTagIds.add(tagIdCell.toString().trim());
+                                        tempLocations.add(kpLocationCell.getNumericCellValue());
+                                    }
+                                }
+
+                                TWL = 0; KTL = 0; TKL = 0; ISL = 0;
+                                for (int i = 0; i < tempLines.size(); i++) {
+                                    if (tempLines.get(i).equals("TWL")) {
+                                        TWL++;
+                                    }
+                                    if (tempLines.get(i).equals("KTL")) {
+                                        KTL++;
+                                    }
+                                    if (tempLines.get(i).equals("TKL")) {
+                                        TKL++;
+                                    }
+                                    if (tempLines.get(i).equals("ISL")) {
+                                        ISL++;
+                                    }
+                                }
+
+                                TWLPanel.tagLines = new String[TWL];
+                                TWLPanel.tagStations = new String[TWL];
+                                TWLPanel.tagSides = new String[TWL];
+                                TWLPanel.tagIds = new String[TWL];
+                                TWLPanel.tagLocations = new double[TWL];
+
+                                TWL = 0; KTL = 0; TKL = 0; ISL = 0;
+                                for (int i = 0; i < tempLines.size(); i++) {
+                                    if (tempLines.get(i).equals("TWL")) {
+                                        TWLPanel.tagLines[TWL] = tempLines.get(i);
+                                        TWLPanel.tagStations[TWL] = tempStations.get(i);
+                                        TWLPanel.tagSides[TWL] = tempSides.get(i);
+                                        TWLPanel.tagIds[TWL] = tempTagIds.get(i);
+                                        TWLPanel.tagLocations[TWL] = tempLocations.get(i);
+                                        TWL++;
+                                    }
+                                    if (tempLines.get(i).equals("KTL")) {
+                                        KTL++;
+                                    }
+                                    if (tempLines.get(i).equals("TKL")) {
+                                        TKL++;
+                                    }
+                                    if (tempLines.get(i).equals("ISL")) {
+                                        ISL++;
+                                    }
+                                }
+
+                                break;
                             case "SAB":
 
                                 tempLines = new ArrayList<>();
@@ -2000,6 +2092,7 @@ public class MenuBar extends JMenuBar implements ActionListener {
                     ControlPanel.signalButton.setEnabled(true);
                     ControlPanel.impedanceBondButton.setEnabled(true);
                     ControlPanel.beaconButton.setEnabled(true);
+                    ControlPanel.tagButton.setEnabled(true);
                     ControlPanel.sabButton.setEnabled(true);
                     ControlPanel.boxButton.setEnabled(true);
                     ControlPanel.otherButton.setEnabled(true);
@@ -2009,6 +2102,9 @@ public class MenuBar extends JMenuBar implements ActionListener {
                     ControlPanel.floodgateDataButton.setEnabled(true);
                     importedFile.close();
                     
+                } catch (LinkageError ex) {
+                    JOptionPane.showMessageDialog(null, "Failed to load Excel library dependency: " + ex.getClass().getSimpleName() + "\n" + ex.getMessage() + "\nPlease ensure Apache POI and XMLBeans versions match in your Eclipse classpath.", "Excel Library Error", JOptionPane.ERROR_MESSAGE);
+                    return;
                 } catch (FileNotFoundException ex) {
                     throw new RuntimeException(ex);
                 } catch (IOException ex) {
