@@ -63,6 +63,8 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
 
     // Variables for search
     static String selectedStation = ""; static String selectedEquipment = ""; static String selectedId = "";
+    double lastTagDataLabelXUp = Double.NaN; double lastTagDataLabelXDn = Double.NaN;
+    int tagDataLabelLevelUp = 0; int tagDataLabelLevelDn = 0;
 
 
     // Painting setup
@@ -93,6 +95,13 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             scaledPadding = padding * scaleY;
         }
         return (int)scaledPadding;
+    }
+
+    public String formatValue(double value) {
+        if (Math.floor(value) == value) {
+            return String.valueOf((int) value);
+        }
+        return String.format("%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 
 
@@ -1132,6 +1141,7 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
     public void drawTag(Graphics2D g, double xCoordinate, int yCoordinate, String upOrDn, String id, int equipRefFromTrack, int trackRefFromTrack, boolean isSelected){
         int x = (int)worldToScreenConverter(xCoordinate, offsetX, scaleX);
         int y = (int)worldToScreenConverter(yCoordinate, offsetY, scaleY);
+        String formattedId = id != null && id.endsWith(".0") ? id.substring(0, id.length() - 2) : id;
 
         if (isSelected) {
             g.setColor(Color.RED);
@@ -1142,14 +1152,21 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             g.fillRect(x, y - paddingToScale(10 + 5, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
             g.drawRect(x + paddingToScale(2, 'X'), y - paddingToScale(10 + 5, 'Y'), paddingToScale(8, 'X'), paddingToScale(5, 'Y'));
 
-            int idWidth = g.getFontMetrics().stringWidth(id);
+            int idWidth = g.getFontMetrics().stringWidth(formattedId);
             int idHeight = g.getFontMetrics().getHeight();
-            g.drawString(id, x + paddingToScale(5, 'X') - idWidth / 2, y - paddingToScale(10 + 10 + 1, 'Y') + idHeight / 2);
+            g.drawString(formattedId, x + paddingToScale(5, 'X') - idWidth / 2, y - paddingToScale(10 + 10 + 1, 'Y') + idHeight / 2);
 
             if (isShowTagData) {
-                int numberWidth = g.getFontMetrics().stringWidth(String.valueOf(xCoordinate));
+                String locationLabel = formatValue(xCoordinate);
+                int numberWidth = g.getFontMetrics().stringWidth(locationLabel);
+                if (Double.isNaN(lastTagDataLabelXUp) || Math.abs(x - lastTagDataLabelXUp) > paddingToScale(25, 'X')) {
+                    tagDataLabelLevelUp = 0;
+                } else {
+                    tagDataLabelLevelUp = (tagDataLabelLevelUp + 1) % 3;
+                }
+                lastTagDataLabelXUp = x;
                 g.drawLine(x, y - paddingToScale(equipRefFromTrack, 'Y'), x, y - paddingToScale(trackRefFromTrack, 'Y'));
-                g.drawString(String.valueOf(xCoordinate), x-numberWidth/2, y - paddingToScale(equipRefFromTrack + 5, 'Y'));
+                g.drawString(locationLabel, x-numberWidth/2, y - paddingToScale(equipRefFromTrack + 5 + (tagDataLabelLevelUp * 10), 'Y'));
             }
         }
         if (upOrDn.equals("DN")) {
@@ -1157,14 +1174,21 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             g.fillRect(x - paddingToScale(2, 'X'), y + paddingToScale(10, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
             g.drawRect(x - paddingToScale(2 + 8, 'X'), y + paddingToScale(10, 'Y'), paddingToScale(8, 'X'), paddingToScale(5, 'Y'));
 
-            int idWidth = g.getFontMetrics().stringWidth(id);
+            int idWidth = g.getFontMetrics().stringWidth(formattedId);
             int idHeight = g.getFontMetrics().getHeight();
-            g.drawString(id, x - paddingToScale(5, 'X') - idWidth / 2, y + paddingToScale(10 + 5 + 2, 'Y') + idHeight / 2);
+            g.drawString(formattedId, x - paddingToScale(5, 'X') - idWidth / 2, y + paddingToScale(10 + 5 + 2, 'Y') + idHeight / 2);
 
             if (isShowTagData) {
-                int numberWidth = g.getFontMetrics().stringWidth(String.valueOf(xCoordinate));
+                String locationLabel = formatValue(xCoordinate);
+                int numberWidth = g.getFontMetrics().stringWidth(locationLabel);
+                if (Double.isNaN(lastTagDataLabelXDn) || Math.abs(x - lastTagDataLabelXDn) > paddingToScale(25, 'X')) {
+                    tagDataLabelLevelDn = 0;
+                } else {
+                    tagDataLabelLevelDn = (tagDataLabelLevelDn + 1) % 3;
+                }
+                lastTagDataLabelXDn = x;
                 g.drawLine(x, y + paddingToScale(equipRefFromTrack, 'Y'), x, y + paddingToScale(trackRefFromTrack, 'Y'));
-                g.drawString(String.valueOf(xCoordinate), x-numberWidth/2, y + paddingToScale(equipRefFromTrack + 10, 'Y'));
+                g.drawString(locationLabel, x-numberWidth/2, y + paddingToScale(equipRefFromTrack + 10 + (tagDataLabelLevelDn * 10), 'Y'));
             }
         }
 
@@ -1687,6 +1711,10 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             }
 
             if (isShowTag) {
+                lastTagDataLabelXUp = Double.NaN;
+                lastTagDataLabelXDn = Double.NaN;
+                tagDataLabelLevelUp = 0;
+                tagDataLabelLevelDn = 0;
                 for (int i = 0; i < tagLines.length; i++) {
                     if (tagSides[i].equals("UP")) {
                         drawTag(g, tagLocations[i], upTrack, tagSides[i], tagIds[i], equipmentRefDistance, trackRefDistance, (selectedEquipment.equals("Tag") && tagStations[i].equals(selectedStation) && tagIds[i].equals(selectedId)));

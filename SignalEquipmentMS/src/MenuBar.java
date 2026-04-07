@@ -1686,7 +1686,16 @@ public class MenuBar extends JMenuBar implements ActionListener {
                                         tempLines.add(lineCell.toString().trim());
                                         tempStations.add(stationCell.toString().trim());
                                         tempSides.add(sideCell.toString().trim());
-                                        tempTagIds.add(tagIdCell.toString().trim());
+                                        if (tagIdCell.getCellType() == CellType.NUMERIC) {
+                                            double rawTagId = tagIdCell.getNumericCellValue();
+                                            if (Math.floor(rawTagId) == rawTagId) {
+                                                tempTagIds.add(String.valueOf((int) rawTagId));
+                                            } else {
+                                                tempTagIds.add(String.valueOf(rawTagId));
+                                            }
+                                        } else {
+                                            tempTagIds.add(tagIdCell.toString().trim());
+                                        }
                                         tempLocations.add(kpLocationCell.getNumericCellValue());
                                     }
                                 }
