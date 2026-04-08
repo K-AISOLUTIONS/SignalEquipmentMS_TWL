@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
 
 public class TWLPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ActionListener{
 
@@ -39,6 +37,9 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
     
     public static String[] tagHeaders; public static String[] tagLines; public static String[] tagStations; public static String[] tagSides; public static String[] tagIds; 
     public static double[] tagLocations;
+
+    public static String[] apHeaders; public static String[] apLines; public static String[] apStations; public static String[] apSides;
+    public static String[] apIds; public static double[] apLocations; public static String[] apLeftOrRights;
     
     public static String[] additionalHeaders; public static String[] additionalLines; public static String[] additionalStations; public static String[] additionalSides;
     public static double[] additionalLocations; public static String[] additionalNames;
@@ -62,9 +63,14 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
     static boolean isShowSab = false; static boolean isShowSabData = false;
     static boolean isShowBox = false; static boolean isShowBoxData = false;
     static boolean isShowTag = false; static boolean isShowTagData = false;
+    static boolean isShowAP = false; static boolean isShowAPData = false;
 
     // Variables for search
     static String selectedStation = ""; static String selectedEquipment = ""; static String selectedId = "";
+    double lastTagDataLabelXUp = Double.NaN; double lastTagDataLabelXDn = Double.NaN;
+    int tagDataLabelLevelUp = 0; int tagDataLabelLevelDn = 0;
+    double lastApLabelXUpper = Double.NaN; double lastApLabelXLower = Double.NaN;
+    int apLabelLevelUpper = 0; int apLabelLevelLower = 0;
 
 
     // Painting setup
@@ -95,6 +101,13 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             scaledPadding = padding * scaleY;
         }
         return (int)scaledPadding;
+    }
+
+    public String formatValue(double value) {
+        if (Math.floor(value) == value) {
+            return String.valueOf((int) value);
+        }
+        return String.format("%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 
 
@@ -1131,6 +1144,145 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
         }
     }
 
+    public void drawTag(Graphics2D g, double xCoordinate, int yCoordinate, String upOrDn, String id, int equipRefFromTrack, int trackRefFromTrack, boolean isSelected){
+        int x = (int)worldToScreenConverter(xCoordinate, offsetX, scaleX);
+        int y = (int)worldToScreenConverter(yCoordinate, offsetY, scaleY);
+        String formattedId = id != null && id.endsWith(".0") ? id.substring(0, id.length() - 2) : id;
+
+        if (isSelected) {
+            g.setColor(Color.RED);
+        }
+
+        if (upOrDn.equals("UP")) {
+            g.drawRect(x, y - paddingToScale(10 + 5, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
+            g.fillRect(x, y - paddingToScale(10 + 5, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
+            g.drawRect(x + paddingToScale(2, 'X'), y - paddingToScale(10 + 5, 'Y'), paddingToScale(8, 'X'), paddingToScale(5, 'Y'));
+
+            int idWidth = g.getFontMetrics().stringWidth(formattedId);
+            int idHeight = g.getFontMetrics().getHeight();
+            g.drawString(formattedId, x + paddingToScale(5, 'X') - idWidth / 2, y - paddingToScale(10 + 10 + 1, 'Y') + idHeight / 2);
+
+            if (isShowTagData) {
+                String locationLabel = formatValue(xCoordinate);
+                int numberWidth = g.getFontMetrics().stringWidth(locationLabel);
+                if (Double.isNaN(lastTagDataLabelXUp) || Math.abs(x - lastTagDataLabelXUp) > paddingToScale(25, 'X')) {
+                    tagDataLabelLevelUp = 0;
+                } else {
+                    tagDataLabelLevelUp = (tagDataLabelLevelUp + 1) % 3;
+                }
+                lastTagDataLabelXUp = x;
+                g.drawLine(x, y - paddingToScale(equipRefFromTrack, 'Y'), x, y - paddingToScale(trackRefFromTrack, 'Y'));
+                g.drawString(locationLabel, x-numberWidth/2, y - paddingToScale(equipRefFromTrack + 5 + (tagDataLabelLevelUp * 10), 'Y'));
+            }
+        }
+        if (upOrDn.equals("DN")) {
+            g.drawRect(x - paddingToScale(2, 'X'), y + paddingToScale(10, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
+            g.fillRect(x - paddingToScale(2, 'X'), y + paddingToScale(10, 'Y'), paddingToScale(2, 'X'), paddingToScale(5, 'Y'));
+            g.drawRect(x - paddingToScale(2 + 8, 'X'), y + paddingToScale(10, 'Y'), paddingToScale(8, 'X'), paddingToScale(5, 'Y'));
+
+            int idWidth = g.getFontMetrics().stringWidth(formattedId);
+            int idHeight = g.getFontMetrics().getHeight();
+            g.drawString(formattedId, x - paddingToScale(5, 'X') - idWidth / 2, y + paddingToScale(10 + 5 + 2, 'Y') + idHeight / 2);
+
+            if (isShowTagData) {
+                String locationLabel = formatValue(xCoordinate);
+                int numberWidth = g.getFontMetrics().stringWidth(locationLabel);
+                if (Double.isNaN(lastTagDataLabelXDn) || Math.abs(x - lastTagDataLabelXDn) > paddingToScale(25, 'X')) {
+                    tagDataLabelLevelDn = 0;
+                } else {
+                    tagDataLabelLevelDn = (tagDataLabelLevelDn + 1) % 3;
+                }
+                lastTagDataLabelXDn = x;
+                g.drawLine(x, y + paddingToScale(equipRefFromTrack, 'Y'), x, y + paddingToScale(trackRefFromTrack, 'Y'));
+                g.drawString(locationLabel, x-numberWidth/2, y + paddingToScale(equipRefFromTrack + 10 + (tagDataLabelLevelDn * 10), 'Y'));
+            }
+        }
+
+        if (isSelected) {
+            g.setColor(Color.BLACK);
+        }
+    }
+
+    public void drawAP(Graphics2D g, double xCoordinate, int yCoordinate, String upOrDn, String leftOrRight, String id, int equipRefFromTrack, int trackRefFromTrack, boolean isSelected){
+        int x = (int)worldToScreenConverter(xCoordinate, offsetX, scaleX);
+        int y = (int)worldToScreenConverter(yCoordinate, offsetY, scaleY);
+        String side = leftOrRight == null ? "" : leftOrRight.trim().toUpperCase();
+        boolean isUpperSide = (upOrDn.equals("UP") && side.equals("L")) || (upOrDn.equals("DN") && side.equals("R"));
+        boolean isLowerSide = !isUpperSide;
+
+        if (isSelected) {
+            g.setColor(Color.RED);
+        }
+
+        int symbolY = isUpperSide ? y - paddingToScale(28, 'Y') : y + paddingToScale(28, 'Y');
+
+        int labelLevel = 0;
+        if (isUpperSide) {
+            if (Double.isNaN(lastApLabelXUpper) || Math.abs(x - lastApLabelXUpper) > paddingToScale(35, 'X')) {
+                apLabelLevelUpper = 0;
+            } else {
+                apLabelLevelUpper = (apLabelLevelUpper + 1) % 3;
+            }
+            lastApLabelXUpper = x;
+            labelLevel = apLabelLevelUpper;
+        } else {
+            if (Double.isNaN(lastApLabelXLower) || Math.abs(x - lastApLabelXLower) > paddingToScale(35, 'X')) {
+                apLabelLevelLower = 0;
+            } else {
+                apLabelLevelLower = (apLabelLevelLower + 1) % 3;
+            }
+            lastApLabelXLower = x;
+            labelLevel = apLabelLevelLower;
+        }
+
+        int nameTextY = symbolY + paddingToScale(12 + labelLevel * 8, 'Y');
+        int locationTextY = isUpperSide
+                ? y - paddingToScale(equipRefFromTrack + 8 + labelLevel * 8, 'Y')
+                : y + paddingToScale(equipRefFromTrack + 10 + labelLevel * 8, 'Y');
+
+        g.drawLine(x, y, x, symbolY);
+        g.drawLine(x - paddingToScale(14, 'X'), symbolY, x + paddingToScale(14, 'X'), symbolY);
+        for (int i = -3; i <= 3; i++) {
+            int tickX = x + paddingToScale(i * 4, 'X');
+            int tickHeight = (i == -1 || i == 0 || i == 1) ? 7 : 5;
+            g.drawLine(tickX, symbolY - paddingToScale(tickHeight, 'Y'), tickX, symbolY + paddingToScale(tickHeight, 'Y'));
+        }
+
+        g.drawOval(x - paddingToScale(4, 'X'), symbolY - paddingToScale(4, 'Y'), paddingToScale(8, 'X'), paddingToScale(8, 'Y'));
+        g.drawLine(x - paddingToScale(4, 'X'), symbolY, x + paddingToScale(4, 'X'), symbolY);
+
+        if (side.equals("L")) {
+            g.drawLine(x - paddingToScale(14, 'X'), symbolY, x - paddingToScale(18, 'X'), symbolY);
+        } else if (side.equals("R")) {
+            g.drawLine(x + paddingToScale(14, 'X'), symbolY, x + paddingToScale(18, 'X'), symbolY);
+        }
+
+        Font originalFont = g.getFont();
+        Font apFont = originalFont.deriveFont(originalFont.getSize() * 0.85F);
+        g.setFont(apFont);
+
+        int idWidth = g.getFontMetrics().stringWidth(id);
+        g.drawString(id, x - idWidth / 2, nameTextY);
+
+        if (isShowAPData) {
+            String locationLabel = formatValue(xCoordinate);
+            int numberWidth = g.getFontMetrics().stringWidth(locationLabel);
+            if (isUpperSide) {
+                g.drawLine(x, y - paddingToScale(equipRefFromTrack, 'Y'), x, y - paddingToScale(trackRefFromTrack, 'Y'));
+            }
+            if (isLowerSide) {
+                g.drawLine(x, y + paddingToScale(equipRefFromTrack, 'Y'), x, y + paddingToScale(trackRefFromTrack, 'Y'));
+            }
+            g.drawString(locationLabel, x - numberWidth / 2, locationTextY);
+        }
+
+        g.setFont(originalFont);
+
+        if (isSelected) {
+            g.setColor(Color.BLACK);
+        }
+    }
+
 
 
 
@@ -1640,6 +1792,36 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
                     }
                     if (beaconSides[i].equals("DN")) {
                         drawBeacon(g, beaconLocations[i], dnTrack, beaconSides[i], beaconIds[i], beaconTypes[i], beaconLabels[i], equipmentRefDistance, trackRefDistance, beaconReverses[i], (selectedEquipment.equals("Beacon") && beaconStations[i].equals(selectedStation) && beaconIds[i].equals(selectedId)));
+                    }
+                }
+            }
+
+            if (isShowTag) {
+                lastTagDataLabelXUp = Double.NaN;
+                lastTagDataLabelXDn = Double.NaN;
+                tagDataLabelLevelUp = 0;
+                tagDataLabelLevelDn = 0;
+                for (int i = 0; i < tagLines.length; i++) {
+                    if (tagSides[i].equals("UP")) {
+                        drawTag(g, tagLocations[i], upTrack, tagSides[i], tagIds[i], equipmentRefDistance, trackRefDistance, (selectedEquipment.equals("Tag") && tagStations[i].equals(selectedStation) && tagIds[i].equals(selectedId)));
+                    }
+                    if (tagSides[i].equals("DN")) {
+                        drawTag(g, tagLocations[i], dnTrack, tagSides[i], tagIds[i], equipmentRefDistance, trackRefDistance, (selectedEquipment.equals("Tag") && tagStations[i].equals(selectedStation) && tagIds[i].equals(selectedId)));
+                    }
+                }
+            }
+
+            if (isShowAP) {
+                lastApLabelXUpper = Double.NaN;
+                lastApLabelXLower = Double.NaN;
+                apLabelLevelUpper = 0;
+                apLabelLevelLower = 0;
+                for (int i = 0; i < apLines.length; i++) {
+                    if (apSides[i].equals("UP")) {
+                        drawAP(g, apLocations[i], upTrack, apSides[i], apLeftOrRights[i], apIds[i], equipmentRefDistance, trackRefDistance, (selectedEquipment.equals("AP") && apStations[i].equals(selectedStation) && apIds[i].equals(selectedId)));
+                    }
+                    if (apSides[i].equals("DN")) {
+                        drawAP(g, apLocations[i], dnTrack, apSides[i], apLeftOrRights[i], apIds[i], equipmentRefDistance, trackRefDistance, (selectedEquipment.equals("AP") && apStations[i].equals(selectedStation) && apIds[i].equals(selectedId)));
                     }
                 }
             }
