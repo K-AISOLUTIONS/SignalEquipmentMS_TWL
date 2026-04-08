@@ -1792,8 +1792,19 @@ public class MenuBar extends JMenuBar implements ActionListener {
                                             continue;
                                         }
 
-                                        String apSide = sideCell.toString().trim();
+                                        String apSide = sideCell.toString().trim().toUpperCase();
                                         if (!(apSide.equals("UP") || apSide.equals("DN"))) {
+                                            continue;
+                                        }
+
+                                        double apLocation;
+                                        try {
+                                            if (locationCell.getCellType() == CellType.NUMERIC) {
+                                                apLocation = locationCell.getNumericCellValue();
+                                            } else {
+                                                apLocation = Double.parseDouble(locationCell.toString().trim());
+                                            }
+                                        } catch (Exception parseException) {
                                             continue;
                                         }
 
@@ -1801,8 +1812,8 @@ public class MenuBar extends JMenuBar implements ActionListener {
                                         tempStations.add(stationCell.toString().trim());
                                         tempApIds.add(idCell.toString().trim());
                                         tempSides.add(apSide);
-                                        tempLocations.add(locationCell.getNumericCellValue());
-                                        tempApLeftOrRights.add(leftRightCell.toString().trim());
+                                        tempLocations.add(apLocation);
+                                        tempApLeftOrRights.add(leftRightCell.toString().trim().toUpperCase());
                                     }
                                 }
 

@@ -115,6 +115,13 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
         return String.format("%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 
+    public String formatValue(double value) {
+        if (Math.floor(value) == value) {
+            return String.valueOf((int) value);
+        }
+        return String.format("%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
+    }
+
 
     // Draw the reference line for different reference
     public void drawReference(Graphics2D g, int upTrack, int dnTrack, double start, double end, int refFromTrack, String refName){
@@ -1216,27 +1223,29 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             g.setColor(Color.RED);
         }
 
-        int symbolY = upOrDn.equals("UP") ? y - paddingToScale(45, 'Y') : y + paddingToScale(45, 'Y');
-        int textY = upOrDn.equals("UP") ? y - paddingToScale(18, 'Y') : y + paddingToScale(20, 'Y');
-        int locationTextY = upOrDn.equals("UP") ? y - paddingToScale(equipRefFromTrack + 16, 'Y') : y + paddingToScale(equipRefFromTrack + 16, 'Y');
+        int symbolY = upOrDn.equals("UP") ? y - paddingToScale(42, 'Y') : y + paddingToScale(42, 'Y');
+        int nameTextY = upOrDn.equals("UP") ? symbolY + paddingToScale(24, 'Y') : symbolY + paddingToScale(24, 'Y');
+        int locationTextY = upOrDn.equals("UP") ? symbolY + paddingToScale(40, 'Y') : symbolY + paddingToScale(40, 'Y');
 
         g.drawLine(x, y, x, symbolY);
-        g.drawLine(x - paddingToScale(22, 'X'), symbolY, x + paddingToScale(22, 'X'), symbolY);
+        g.drawLine(x - paddingToScale(24, 'X'), symbolY, x + paddingToScale(24, 'X'), symbolY);
         for (int i = -3; i <= 3; i++) {
             int tickX = x + paddingToScale(i * 6, 'X');
-            int tickTop = symbolY - paddingToScale((i == 0 ? 10 : 6), 'Y');
-            int tickBottom = symbolY + paddingToScale((i == 0 ? 10 : 6), 'Y');
-            g.drawLine(tickX, tickTop, tickX, tickBottom);
+            int tickHeight = (i == -1 || i == 0 || i == 1) ? 12 : 8;
+            g.drawLine(tickX, symbolY - paddingToScale(tickHeight, 'Y'), tickX, symbolY + paddingToScale(tickHeight, 'Y'));
         }
 
-        if ("L".equals(leftOrRight)) {
-            g.drawLine(x - paddingToScale(22, 'X'), symbolY, x - paddingToScale(28, 'X'), symbolY);
-        } else if ("R".equals(leftOrRight)) {
-            g.drawLine(x + paddingToScale(22, 'X'), symbolY, x + paddingToScale(28, 'X'), symbolY);
+        g.drawOval(x - paddingToScale(5, 'X'), symbolY - paddingToScale(5, 'Y'), paddingToScale(10, 'X'), paddingToScale(10, 'Y'));
+        g.drawLine(x - paddingToScale(5, 'X'), symbolY, x + paddingToScale(5, 'X'), symbolY);
+
+        if ("L".equalsIgnoreCase(leftOrRight)) {
+            g.drawLine(x - paddingToScale(24, 'X'), symbolY, x - paddingToScale(30, 'X'), symbolY);
+        } else if ("R".equalsIgnoreCase(leftOrRight)) {
+            g.drawLine(x + paddingToScale(24, 'X'), symbolY, x + paddingToScale(30, 'X'), symbolY);
         }
 
         int idWidth = g.getFontMetrics().stringWidth(id);
-        g.drawString(id, x - idWidth / 2, textY);
+        g.drawString(id, x - idWidth / 2, nameTextY);
 
         if (isShowAPData) {
             String locationLabel = formatValue(xCoordinate);
