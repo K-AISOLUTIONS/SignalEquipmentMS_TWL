@@ -131,6 +131,13 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
         return String.format("%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 
+    public String formatValue(double value) {
+        if (Math.floor(value) == value) {
+            return String.valueOf((int) value);
+        }
+        return String.format("%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
+    }
+
 
     // Draw the reference line for different reference
     public void drawReference(Graphics2D g, int upTrack, int dnTrack, double start, double end, int refFromTrack, String refName){
@@ -1235,7 +1242,7 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             g.setColor(Color.RED);
         }
 
-        int symbolY = isUpperSide ? y - paddingToScale(28, 'Y') : y + paddingToScale(28, 'Y');
+        int symbolY = isUpperSide ? y - paddingToScale(22, 'Y') : y + paddingToScale(22, 'Y');
 
         int labelLevel = 0;
         if (isUpperSide) {
@@ -1256,30 +1263,30 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             labelLevel = apLabelLevelLower;
         }
 
-        int nameTextY = symbolY + paddingToScale(12 + labelLevel * 8, 'Y');
-        int locationTextY = isUpperSide
-                ? y - paddingToScale(equipRefFromTrack + 8 + labelLevel * 8, 'Y')
-                : y + paddingToScale(equipRefFromTrack + 10 + labelLevel * 8, 'Y');
+        int nameTextY = symbolY + paddingToScale(10 + labelLevel * 7, 'Y');
+        int locationTextY = upOrDn.equals("UP")
+                ? y - paddingToScale(equipRefFromTrack + 6 + labelLevel * 7, 'Y')
+                : y + paddingToScale(equipRefFromTrack + 10 + labelLevel * 7, 'Y');
 
         g.drawLine(x, y, x, symbolY);
-        g.drawLine(x - paddingToScale(14, 'X'), symbolY, x + paddingToScale(14, 'X'), symbolY);
+        g.drawLine(x - paddingToScale(10, 'X'), symbolY, x + paddingToScale(10, 'X'), symbolY);
         for (int i = -3; i <= 3; i++) {
-            int tickX = x + paddingToScale(i * 4, 'X');
-            int tickHeight = (i == -1 || i == 0 || i == 1) ? 7 : 5;
+            int tickX = x + paddingToScale(i * 3, 'X');
+            int tickHeight = (i == -1 || i == 0 || i == 1) ? 5 : 3;
             g.drawLine(tickX, symbolY - paddingToScale(tickHeight, 'Y'), tickX, symbolY + paddingToScale(tickHeight, 'Y'));
         }
 
-        g.drawOval(x - paddingToScale(4, 'X'), symbolY - paddingToScale(4, 'Y'), paddingToScale(8, 'X'), paddingToScale(8, 'Y'));
-        g.drawLine(x - paddingToScale(4, 'X'), symbolY, x + paddingToScale(4, 'X'), symbolY);
+        g.drawOval(x - paddingToScale(3, 'X'), symbolY - paddingToScale(3, 'Y'), paddingToScale(6, 'X'), paddingToScale(6, 'Y'));
+        g.drawLine(x - paddingToScale(3, 'X'), symbolY, x + paddingToScale(3, 'X'), symbolY);
 
         if (side.equals("L")) {
-            g.drawLine(x - paddingToScale(14, 'X'), symbolY, x - paddingToScale(18, 'X'), symbolY);
+            g.drawLine(x - paddingToScale(10, 'X'), symbolY, x - paddingToScale(13, 'X'), symbolY);
         } else if (side.equals("R")) {
-            g.drawLine(x + paddingToScale(14, 'X'), symbolY, x + paddingToScale(18, 'X'), symbolY);
+            g.drawLine(x + paddingToScale(10, 'X'), symbolY, x + paddingToScale(13, 'X'), symbolY);
         }
 
         Font originalFont = g.getFont();
-        Font apFont = originalFont.deriveFont(originalFont.getSize() * 0.85F);
+        Font apFont = originalFont.deriveFont(originalFont.getSize() * 0.75F);
         g.setFont(apFont);
 
         int idWidth = g.getFontMetrics().stringWidth(id);
@@ -1288,10 +1295,10 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
         if (isShowAPData) {
             String locationLabel = formatValue(xCoordinate);
             int numberWidth = g.getFontMetrics().stringWidth(locationLabel);
-            if (isUpperSide) {
+            if (upOrDn.equals("UP")) {
                 g.drawLine(x, y - paddingToScale(equipRefFromTrack, 'Y'), x, y - paddingToScale(trackRefFromTrack, 'Y'));
             }
-            if (isLowerSide) {
+            if (upOrDn.equals("DN")) {
                 g.drawLine(x, y + paddingToScale(equipRefFromTrack, 'Y'), x, y + paddingToScale(trackRefFromTrack, 'Y'));
             }
             g.drawString(locationLabel, x - numberWidth / 2, locationTextY);
