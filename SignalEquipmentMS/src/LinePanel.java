@@ -46,6 +46,13 @@ public class LinePanel extends JPanel implements ActionListener {
                 ControlPanel.signalButton.setText("Show Signal");
                 ControlPanel.signalDataButton.setEnabled(false);
             }
+            if (TWLPanel.isShowAP){
+                ControlPanel.apButton.setText("Hide AP");
+                ControlPanel.apDataButton.setEnabled(true);
+            } else {
+                ControlPanel.apButton.setText("Show AP");
+                ControlPanel.apDataButton.setEnabled(false);
+            }
             if (TWLPanel.isShowImpedanceBond){
                 ControlPanel.impedanceBondButton.setText("Hide Impedance Bond");
                 ControlPanel.impedanceBondDataButton.setEnabled(true);
@@ -108,6 +115,11 @@ public class LinePanel extends JPanel implements ActionListener {
             } else {
                 ControlPanel.signalDataButton.setText("Show Signal Location");
             }
+            if (TWLPanel.isShowAPData){
+                ControlPanel.apDataButton.setText("Hide AP Location");
+            } else {
+                ControlPanel.apDataButton.setText("Show AP Location");
+            }
             if (TWLPanel.isShowImpedanceBondData){
                 ControlPanel.impedanceBondDataButton.setText("Hide Impedance Bond Location");
             } else {
@@ -148,6 +160,9 @@ public class LinePanel extends JPanel implements ActionListener {
         }
         if (e.getSource() == KTLButton) {
             MyFrame.changeDisplay("KTL");
+            ControlPanel.apButton.setText("Show AP");
+            ControlPanel.apDataButton.setText("Show AP Location");
+            ControlPanel.apDataButton.setEnabled(false);
 
             if (KTLPanel.isShowSignal){
                 ControlPanel.signalButton.setText("Hide Signal");
@@ -245,6 +260,9 @@ public class LinePanel extends JPanel implements ActionListener {
         }
         if (e.getSource() == TKLButton) {
             MyFrame.changeDisplay("TKL");
+            ControlPanel.apButton.setText("Show AP");
+            ControlPanel.apDataButton.setText("Show AP Location");
+            ControlPanel.apDataButton.setEnabled(false);
 
             if (TKLPanel.isShowSignal){
                 ControlPanel.signalButton.setText("Hide Signal");
@@ -342,6 +360,9 @@ public class LinePanel extends JPanel implements ActionListener {
         }
         if (e.getSource() == ISLButton) {
             MyFrame.changeDisplay("ISL");
+            ControlPanel.apButton.setText("Show AP");
+            ControlPanel.apDataButton.setText("Show AP Location");
+            ControlPanel.apDataButton.setEnabled(false);
 
             if (ISLPanel.isShowSignal){
                 ControlPanel.signalButton.setText("Hide Signal");

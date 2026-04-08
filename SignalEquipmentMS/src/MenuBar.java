@@ -1744,6 +1744,114 @@ public class MenuBar extends JMenuBar implements ActionListener {
                                 }
 
                                 break;
+                            case "AP":
+
+                                tempLines = new ArrayList<>();
+                                tempStations = new ArrayList<>();
+                                tempSides = new ArrayList<>();
+                                ArrayList<String> tempApIds = new ArrayList<>();
+                                tempLocations = new ArrayList<>();
+                                ArrayList<String> tempApLeftOrRights = new ArrayList<>();
+
+                                int antennaIdColumn = 2;
+                                int apSideColumn = 3;
+                                int apLocationColumn = 4;
+                                int apLeftRightColumn = 5;
+
+                                while(rowIterator.hasNext()){
+                                    Row row = rowIterator.next();
+                                    if (row.getRowNum() == 0) {
+                                        for (int col = 0; col <= row.getLastCellNum(); col++) {
+                                            Cell headerCell = row.getCell(col);
+                                            if (headerCell == null) {
+                                                continue;
+                                            }
+                                            String headerText = headerCell.toString().trim().toLowerCase();
+                                            if (headerText.contains("antenna")) {
+                                                antennaIdColumn = col;
+                                            }
+                                            if (headerText.contains("side")) {
+                                                apSideColumn = col;
+                                            }
+                                            if (headerText.contains("location")) {
+                                                apLocationColumn = col;
+                                            }
+                                            if (headerText.contains("left") || headerText.contains("right")) {
+                                                apLeftRightColumn = col;
+                                            }
+                                        }
+                                    } else {
+                                        Cell lineCell = row.getCell(0);
+                                        Cell stationCell = row.getCell(1);
+                                        Cell idCell = row.getCell(antennaIdColumn);
+                                        Cell sideCell = row.getCell(apSideColumn);
+                                        Cell locationCell = row.getCell(apLocationColumn);
+                                        Cell leftRightCell = row.getCell(apLeftRightColumn);
+
+                                        if (lineCell == null || stationCell == null || idCell == null || sideCell == null || locationCell == null || leftRightCell == null) {
+                                            continue;
+                                        }
+
+                                        String apSide = sideCell.toString().trim();
+                                        if (!(apSide.equals("UP") || apSide.equals("DN"))) {
+                                            continue;
+                                        }
+
+                                        tempLines.add(lineCell.toString().trim());
+                                        tempStations.add(stationCell.toString().trim());
+                                        tempApIds.add(idCell.toString().trim());
+                                        tempSides.add(apSide);
+                                        tempLocations.add(locationCell.getNumericCellValue());
+                                        tempApLeftOrRights.add(leftRightCell.toString().trim());
+                                    }
+                                }
+
+                                TWL = 0; KTL = 0; TKL = 0; ISL = 0;
+                                for (int i = 0; i < tempLines.size(); i++) {
+                                    if (tempLines.get(i).equals("TWL")) {
+                                        TWL++;
+                                    }
+                                    if (tempLines.get(i).equals("KTL")) {
+                                        KTL++;
+                                    }
+                                    if (tempLines.get(i).equals("TKL")) {
+                                        TKL++;
+                                    }
+                                    if (tempLines.get(i).equals("ISL")) {
+                                        ISL++;
+                                    }
+                                }
+
+                                TWLPanel.apLines = new String[TWL];
+                                TWLPanel.apStations = new String[TWL];
+                                TWLPanel.apSides = new String[TWL];
+                                TWLPanel.apIds = new String[TWL];
+                                TWLPanel.apLocations = new double[TWL];
+                                TWLPanel.apLeftOrRights = new String[TWL];
+
+                                TWL = 0; KTL = 0; TKL = 0; ISL = 0;
+                                for (int i = 0; i < tempLines.size(); i++) {
+                                    if (tempLines.get(i).equals("TWL")) {
+                                        TWLPanel.apLines[TWL] = tempLines.get(i);
+                                        TWLPanel.apStations[TWL] = tempStations.get(i);
+                                        TWLPanel.apSides[TWL] = tempSides.get(i);
+                                        TWLPanel.apIds[TWL] = tempApIds.get(i);
+                                        TWLPanel.apLocations[TWL] = tempLocations.get(i);
+                                        TWLPanel.apLeftOrRights[TWL] = tempApLeftOrRights.get(i);
+                                        TWL++;
+                                    }
+                                    if (tempLines.get(i).equals("KTL")) {
+                                        KTL++;
+                                    }
+                                    if (tempLines.get(i).equals("TKL")) {
+                                        TKL++;
+                                    }
+                                    if (tempLines.get(i).equals("ISL")) {
+                                        ISL++;
+                                    }
+                                }
+
+                                break;
                             case "SAB":
 
                                 tempLines = new ArrayList<>();
@@ -2099,6 +2207,7 @@ public class MenuBar extends JMenuBar implements ActionListener {
                     LinePanel.ISLButton.setEnabled(true);
 
                     ControlPanel.signalButton.setEnabled(true);
+                    ControlPanel.apButton.setEnabled(true);
                     ControlPanel.impedanceBondButton.setEnabled(true);
                     ControlPanel.beaconButton.setEnabled(true);
                     ControlPanel.tagButton.setEnabled(true);
