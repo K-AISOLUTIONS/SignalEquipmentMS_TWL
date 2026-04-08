@@ -108,6 +108,13 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
         return String.format("%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 
+    public String formatValue(double value) {
+        if (Math.floor(value) == value) {
+            return String.valueOf((int) value);
+        }
+        return String.format("%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
+    }
+
 
     // Draw the reference line for different reference
     public void drawReference(Graphics2D g, int upTrack, int dnTrack, double start, double end, int refFromTrack, String refName){
