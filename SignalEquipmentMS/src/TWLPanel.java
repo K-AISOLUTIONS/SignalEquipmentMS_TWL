@@ -69,6 +69,8 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
     static String selectedStation = ""; static String selectedEquipment = ""; static String selectedId = "";
     double lastTagDataLabelXUp = Double.NaN; double lastTagDataLabelXDn = Double.NaN;
     int tagDataLabelLevelUp = 0; int tagDataLabelLevelDn = 0;
+    double lastApLabelXUpper = Double.NaN; double lastApLabelXLower = Double.NaN;
+    int apLabelLevelUpper = 0; int apLabelLevelLower = 0;
 
 
     // Painting setup
@@ -99,6 +101,13 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             scaledPadding = padding * scaleY;
         }
         return (int)scaledPadding;
+    }
+
+    public String formatValue(double value) {
+        if (Math.floor(value) == value) {
+            return String.valueOf((int) value);
+        }
+        return String.format("%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 
     public String formatValue(double value) {
@@ -1218,31 +1227,60 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
     public void drawAP(Graphics2D g, double xCoordinate, int yCoordinate, String upOrDn, String leftOrRight, String id, int equipRefFromTrack, int trackRefFromTrack, boolean isSelected){
         int x = (int)worldToScreenConverter(xCoordinate, offsetX, scaleX);
         int y = (int)worldToScreenConverter(yCoordinate, offsetY, scaleY);
+        String side = leftOrRight == null ? "" : leftOrRight.trim().toUpperCase();
+        boolean isUpperSide = (upOrDn.equals("UP") && side.equals("L")) || (upOrDn.equals("DN") && side.equals("R"));
+        boolean isLowerSide = !isUpperSide;
 
         if (isSelected) {
             g.setColor(Color.RED);
         }
 
-        int symbolY = upOrDn.equals("UP") ? y - paddingToScale(42, 'Y') : y + paddingToScale(42, 'Y');
-        int nameTextY = upOrDn.equals("UP") ? symbolY + paddingToScale(24, 'Y') : symbolY + paddingToScale(24, 'Y');
-        int locationTextY = upOrDn.equals("UP") ? symbolY + paddingToScale(40, 'Y') : symbolY + paddingToScale(40, 'Y');
+        int symbolY = isUpperSide ? y - paddingToScale(28, 'Y') : y + paddingToScale(28, 'Y');
+
+        int labelLevel = 0;
+        if (isUpperSide) {
+            if (Double.isNaN(lastApLabelXUpper) || Math.abs(x - lastApLabelXUpper) > paddingToScale(35, 'X')) {
+                apLabelLevelUpper = 0;
+            } else {
+                apLabelLevelUpper = (apLabelLevelUpper + 1) % 3;
+            }
+            lastApLabelXUpper = x;
+            labelLevel = apLabelLevelUpper;
+        } else {
+            if (Double.isNaN(lastApLabelXLower) || Math.abs(x - lastApLabelXLower) > paddingToScale(35, 'X')) {
+                apLabelLevelLower = 0;
+            } else {
+                apLabelLevelLower = (apLabelLevelLower + 1) % 3;
+            }
+            lastApLabelXLower = x;
+            labelLevel = apLabelLevelLower;
+        }
+
+        int nameTextY = symbolY + paddingToScale(12 + labelLevel * 8, 'Y');
+        int locationTextY = isUpperSide
+                ? y - paddingToScale(equipRefFromTrack + 8 + labelLevel * 8, 'Y')
+                : y + paddingToScale(equipRefFromTrack + 10 + labelLevel * 8, 'Y');
 
         g.drawLine(x, y, x, symbolY);
-        g.drawLine(x - paddingToScale(24, 'X'), symbolY, x + paddingToScale(24, 'X'), symbolY);
+        g.drawLine(x - paddingToScale(14, 'X'), symbolY, x + paddingToScale(14, 'X'), symbolY);
         for (int i = -3; i <= 3; i++) {
-            int tickX = x + paddingToScale(i * 6, 'X');
-            int tickHeight = (i == -1 || i == 0 || i == 1) ? 12 : 8;
+            int tickX = x + paddingToScale(i * 4, 'X');
+            int tickHeight = (i == -1 || i == 0 || i == 1) ? 7 : 5;
             g.drawLine(tickX, symbolY - paddingToScale(tickHeight, 'Y'), tickX, symbolY + paddingToScale(tickHeight, 'Y'));
         }
 
-        g.drawOval(x - paddingToScale(5, 'X'), symbolY - paddingToScale(5, 'Y'), paddingToScale(10, 'X'), paddingToScale(10, 'Y'));
-        g.drawLine(x - paddingToScale(5, 'X'), symbolY, x + paddingToScale(5, 'X'), symbolY);
+        g.drawOval(x - paddingToScale(4, 'X'), symbolY - paddingToScale(4, 'Y'), paddingToScale(8, 'X'), paddingToScale(8, 'Y'));
+        g.drawLine(x - paddingToScale(4, 'X'), symbolY, x + paddingToScale(4, 'X'), symbolY);
 
-        if ("L".equalsIgnoreCase(leftOrRight)) {
-            g.drawLine(x - paddingToScale(24, 'X'), symbolY, x - paddingToScale(30, 'X'), symbolY);
-        } else if ("R".equalsIgnoreCase(leftOrRight)) {
-            g.drawLine(x + paddingToScale(24, 'X'), symbolY, x + paddingToScale(30, 'X'), symbolY);
+        if (side.equals("L")) {
+            g.drawLine(x - paddingToScale(14, 'X'), symbolY, x - paddingToScale(18, 'X'), symbolY);
+        } else if (side.equals("R")) {
+            g.drawLine(x + paddingToScale(14, 'X'), symbolY, x + paddingToScale(18, 'X'), symbolY);
         }
+
+        Font originalFont = g.getFont();
+        Font apFont = originalFont.deriveFont(originalFont.getSize() * 0.85F);
+        g.setFont(apFont);
 
         int idWidth = g.getFontMetrics().stringWidth(id);
         g.drawString(id, x - idWidth / 2, nameTextY);
@@ -1250,8 +1288,16 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
         if (isShowAPData) {
             String locationLabel = formatValue(xCoordinate);
             int numberWidth = g.getFontMetrics().stringWidth(locationLabel);
+            if (isUpperSide) {
+                g.drawLine(x, y - paddingToScale(equipRefFromTrack, 'Y'), x, y - paddingToScale(trackRefFromTrack, 'Y'));
+            }
+            if (isLowerSide) {
+                g.drawLine(x, y + paddingToScale(equipRefFromTrack, 'Y'), x, y + paddingToScale(trackRefFromTrack, 'Y'));
+            }
             g.drawString(locationLabel, x - numberWidth / 2, locationTextY);
         }
+
+        g.setFont(originalFont);
 
         if (isSelected) {
             g.setColor(Color.BLACK);
@@ -1787,6 +1833,10 @@ public class TWLPanel extends JPanel implements MouseListener, MouseMotionListen
             }
 
             if (isShowAP) {
+                lastApLabelXUpper = Double.NaN;
+                lastApLabelXLower = Double.NaN;
+                apLabelLevelUpper = 0;
+                apLabelLevelLower = 0;
                 for (int i = 0; i < apLines.length; i++) {
                     if (apSides[i].equals("UP")) {
                         drawAP(g, apLocations[i], upTrack, apSides[i], apLeftOrRights[i], apIds[i], equipmentRefDistance, trackRefDistance, (selectedEquipment.equals("AP") && apStations[i].equals(selectedStation) && apIds[i].equals(selectedId)));
